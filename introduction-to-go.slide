@@ -15,7 +15,7 @@ Thank you to our sponsor at CSIRO for the space.
 
 Thank you those attending for taking the time to come out tonight. 
 
-* Outline of this talk.
+* Outline of this talk
 
 The history of Go project
 
@@ -46,20 +46,6 @@ Rob Pike's 2012 paper, [[http://commandcenter.blogspot.com.au/2012/06/less-is-ex
 First public announcement November, 2009. [[https://www.youtube.com/watch?v=rKnDgT73v8s][The Go Programming Language, 2009]]
 
 .image introduction-to-go/pike-2009.png
-
-* unused
-
-From the original Nov 2009 presentation
-
-- The efficiency of a statically-typed compiled langauge with the ease of programming of a dynamically typed language.
-
-- Safety: type safe, and memory safe
-
-- Good support for concurrency and communication
-
-- Efficient, latency-free garbage collection
-
-- High speed compilation.
 
 * Open source
 
@@ -102,33 +88,50 @@ Stable - the bar for adding a new feature is insurmountably high.
 
 - link to r's Gophercon 2014 talk, http://talks.golang.org/2014/hellogophers.slide
 
-* Go, the language
-
 * Language Overview
 
 - The efficiency of a statically-typed compiled langauge with the ease of programming of a dynamically typed language.
 
-* Safety: type safe, and memory safe
+- expand on this
 
-- Garbage collected
+* Good support for concurrency and communication
 
-- Good support for concurrency and communication
-
-- Efficient, latency-free garbage collection
-
-- High speed compilation.
+- Multicore is a reality, multiprocessing is not a solution
 
 * Safety
 
 - Typed, and type safe
 
+	
+
 - Array accesses are bounds checked
 
-- All memory is zeroed when declared
+	s := make([]string, 10)
+
+	for i := 0; i <= 10; i++ {
+		// oops
+	}
+
+- All memory is zeroed if not explicitly initialised
+
+	var q int	// initalised to 0
+	var f = 7	// initalised to 7, type defaults to int
+
+* Safety, continued
 
 - Pointers, but no pointer arythmetic
 
+	var x = 1000
+	var y = &x
+	y += 4		// nope
+
 - No implicit conversions; booleans and integers are not aliases
+
+	i := 2
+	if i { ... }	// nope
+	if i != 0 { ... }
+
+* Garbage collected
 
 * Speed
 
@@ -140,38 +143,33 @@ Specifically to address the issues
 
 - "Fixing it by adding more software isn't going to do it" -[[http://youtu.be/rKnDgT73v8s?t=7m][Rob Pike, Nov 2009]]
 
-
-- Strongly, Statically, Typed
-
 - Variant of the C clurly brace family -- Steve Yegge 'the next big language'
 
-- Opinioned
+* Opinioned
 
--- does not actively enourage multiple paradigms, not a fan of TIMTWTDI
+- Unused variables are an error
 
--- Unused variables are an error
-
--- Unused imports are also an error
+- Unused imports are also an error
 
 - The compiler does not issue warnings, only errors.
 
-Both are a reaction
+- A single expected way to format code as defined by `go fmt` (more on this later)
 
-- Efficient concurrent primatives
+* Modular, incremental, compilation, which we call packages.
 
--- like erlang
+- Unit of compilation is the package, not the file
 
--- not like TBB or Java
+- Unit of importing is the package, not a type
 
-- Modular, incremental, compilation, which we call packages.
+* Simple syntax
 
--- Unit of compilation is the package, not the file
+25 keywords
 
--- Unit of importing is the package, not a type
-
-- Simple syntax
-
--- 27 keywords (??)
+	break        default      func         interface    select
+	case         defer        go           map          struct
+	chan         else         goto         package      switch
+	const        fallthrough  if           range        type
+	continue     for          import       return       var
 
 -- regular, orthogonal concepts
 -- show anon funcs, types, structs
@@ -275,17 +273,15 @@ Simple, zero configuration build tool
 
 * Performance
 
-- Depending on your requirements; good to excellent
+Depending on your requirements; good to excellent
 
-- Varies by architecture; amd64 is the poster child due to its ubiquity
+Varies by architecture; amd64 is the poster child due to its ubiquity
 
-- All platforms have improved overtime
+All platforms have improved overtime
 
-- show Go 1.0 to 1.3 numbers
+* Go 1.0 vs tip (Go 1.4)
 
-- show tech empire benchmarks
-
-- show language shootout benchmarks
+.image introduction-to-go/go1-vs-tip.png
 
 * Application
 
@@ -317,6 +313,8 @@ Online communities
 
 * Questions
 
-This talk is online, [[talks.godoc.org/github.com/davecheney/canberra-gophers/introduction-to-go.slide][talks.godoc.org/github.com/davecheney/canberra-gophers/introduction-to-go.slide]]. 
+This talk is online
+
+[[talks.godoc.org/github.com/davecheney/canberra-gophers/introduction-to-go.slide][talks.godoc.org/github.com/davecheney/canberra-gophers/introduction-to-go.slide]]
 
 All the links inside the talk are clickable, I encourage you to follow them.
