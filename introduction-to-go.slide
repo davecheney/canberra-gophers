@@ -25,23 +25,23 @@ Co-organiser of the Sydney Go Users group along with Andrew Gerrand.
 
 * Outline of this talk
 
-The history of Go project
+- The history of Go project
 
-Overview of the language
+- Overview of the language
 
-Overview of the tools
+- Overview of the tools
 
-Possibly some questions
+- Possibly some questions
 
 * History of the Go project
 
 * Origins of Go
 
-Project started in 2007 by Rob Pike, Robert Griesemer, Ken Thompson
+Go started in 2007 by Rob Pike, Robert Griesemer, Ken Thompson.
 
-Russ Cox and Ian Lance Taylor joined soon after
+Russ Cox and Ian Lance Taylor joined soon after.
 
-There is a story that Go was designed while waiting for a C++ program to compile. This is at best only partly true.
+There is a story that Go was designed while waiting for a C++ program to compile.
 
 * Origins of Go, continued
 
@@ -59,7 +59,7 @@ First public announcement November 10th, 2009. [[https://www.youtube.com/watch?v
 
 Go is an open source project.
 
-All the commits, code review, design are done in the open on a public mailing lists.
+All the commits, code review, design, debate, etc, are done in the open on a public mailing lists.
 
 The only qualification for [[http://golang.org/doc/contribute.html][contributing]] to the project is free time.
 
@@ -71,7 +71,7 @@ Rapid iteration over the next 2.5 years
 
 Go 1.0 marked a line in the sand
 
-- API stability [[http://golang.org/doc/go1compat][The Go 1 compatability document]]
+- API stability. [[http://golang.org/doc/go1compat][The Go 1 compatability document]]
 
 - No major language changes (there have been a few minor additions)
 
@@ -93,7 +93,7 @@ Each release has bought incremental improvements in the compilers, the runtime, 
 
 New platforms and new architectures added.
 
-* Stable 
+* Stablity
 
 Pro:
 
@@ -101,7 +101,7 @@ Pro:
 
 - We assert this on every commit.
 
-- Your code you write today will continue to compile under any newer version of Go.
+- Your code you write today will continue to compile under any newer version of Go 1.
 
 Con:
 
@@ -109,13 +109,9 @@ Con:
 
 * Language Overview
 
-- The efficiency of a statically-typed compiled langauge with the ease of programming of a dynamically typed language.
-
-- expand on this
-
 * Safety
 
-- Typed, and type safe
+Typed, and type safe
 
 	var i int = -1
 	var u uint = 200
@@ -124,7 +120,7 @@ Con:
 
 	if i > u { ... }	// nope
 
-- Array accesses are bounds checked
+Array accesses are bounds checked
 
 	s := make([]string, 10)
 
@@ -132,22 +128,25 @@ Con:
 		// oops
 	}
 
-- no dangling pointers, return a stack value from a function with impunity
+No dangling pointers, return a stack value from a function with impunity.
+
+- Language will move allocations to the stack if required.
+- Escape analysis will move them back if not.
 
 * Safety, continued
 
-- All memory is zeroed if not explicitly initialised
+All memory is zeroed if not explicitly initialised
 
 	var q int	// initalised to 0
 	var f = 7	// initalised to 7, type defaults to int
 
-- Pointers, but no pointer arythmetic
+Pointers, but no pointer arythmetic
 
 	var x = 1000
 	var y = &x
 	y += 4		// nope
 
-- No implicit conversions; booleans and integers are not aliases
+No implicit conversions; booleans and integers are not aliases
 
 	i := 2
 	if i { ... }	// nope
@@ -161,15 +160,13 @@ Con:
 
 * Garbage collected
 
-- not optional (see below, an opinionated language)
+Enables concurrency, eliminates the bookkeeping errors related to ownership of shared values.
 
-- enables concurrency, eliminates the bookkeeping errors related to ownership of shared values.
+Elimitates an entire class of use after free and memory leak bugs.
 
-- elimitates an entire class of use after free and memory leak bugs 
+Performance is good and getting better every release, plans are afoot for a new concurrent compacting collector in the next 12 months.
 
-- performance is good and getting better every release, plans are afoot for a new concurrent compacting collector in the next 12 months.
-
-- in the cases that I have investigated where reporters were blaming the garbage collector for poor performance, these were always cases where their allocation rate was unsustainable.
+- In the cases that I have investigated where reporters were blaming the garbage collector for poor performance, the underlying cause was their allocation rate was unsustainable.
 
 * Speed
 
@@ -187,66 +184,91 @@ Specifically to address the issues
 
 * Opinioned
 
-- Unused variables are an error
+- Unused variables are an error.
 
-- Unused imports are also an error
+- Unused imports are also an error.
 
 - The compiler does not issue warnings, only errors.
 
-- A single expected way to format code as defined by `go fmt` (more on this later)
+- A single way to format code as defined by `go fmt` (more on this later)
 
 * Modular, incremental, compilation, which we call packages.
 
-- Unit of compilation is the package, not the file
+- Unit of compilation is the package, not the file.
 
-- Unit of importing is the package, not a type
+- Unit of importing is the package, not a type, or a symbol.
 
-* Simple syntax
-
-25 keywords
-
-	break        default      func         interface    select
-	case         defer        go           map          struct
-	chan         else         goto         package      switch
-	const        fallthrough  if           range        type
-	continue     for          import       return       var
-
--- regular, orthogonal concepts
--- show anon funcs, types, structs
-
-- Focus on readable code, to the point of being boring -- but it is regular, all Go code looks the same, very easy to work with other's code (assuming it is sane), very easy to spot insane code.
+* Whirlwind language tour
 
 * Constants
 
-- constant types, strings, bools, integers, floats, complex
+Constants come in various kinds, but are by default untyped. 
 
-- arbitrary precision
+Constant strings, bools, integers, floats, complex numbers.
+
+Untyped constants operate with arbitrary precision.
 
 .code introduction-to-go/precision.go /START OMIT/,/END OMIT/
 
+* Types
+
+The usual suspects
+
+- signed integers, `int8`, `int16`, `int32`, `int64`
+
+- unsigned integers, `uint8`, `uint6`, `uint32`, `uint64`
+
+- aliases, `byte`, `rune`, `int`, `uint`
+
+- booleans, `bool`
+
+- strings, `string`
+
+- IEEE floating point, `float32`, `float64`
+
+- Complex type, `complex128`
+
 * Variables
 
-* Expressions
+There are several ways to declare a variable in Go
 
-* Statements
+	// all three vriables are of type int
+	var y = 100
+	var x int	// x == 0
 
-- Statements are _not_ Expressions
+Short variable declaration
 
-	if x = 1 { ... } // nope
-	if x = 1; x == 1 { ... } // yes
+	s := 100	
+
+Leads to type inference
+
+	f, err := os.Open("/etc/motd")
+
+- `f` is a `*os.File` type
+- `err` is an `error` type interface
+
+* Expressions and Statements
+
+Expressions are taken mostly from C.
+
+Statements are _not_ Expressions.
 
 	y = x++	// nope		
 
-* Arrays, slices and maps
+	if x = 1 { ... } // nope
 
-Arrays, typed vectors
+* Arrays and Slices
+
+Arrays are fixed sized typed vectors.
+
+Different sized arrays are different types.
 
 	var buf [100]byte	// an array of 100 bytes
 	var buf2 [20]byte	// an array of 20 bytes
 
 	buf = buf2	// nope
 
-Slices
+Slices are dynamically typed vectors.
 
 	var buf []byte
 	var buf2 []byte
@@ -254,11 +276,34 @@ Slices
 	buf = make([]byte, 20)
 	buf2 = buf
 
-* Arrays, slices and maps, continued
+Both arrays and slices have a length, one is determined at compile time, the other at runtime.
 
-Maps
+* Arrays and Slices, continued
+
+You can slice an array to produce a slice
+
+	var buf [100]byte
+	var b = buf[:10]	
+
+`b` is a slice which contains a reference to the underlying array, `buf`.
+
+* Maps
+
+Maps are a typed 
 	
 	var m map[string]int
+
+* Structs
+
+Structs are composite types
+
+	type S struct {
+		A int
+		B bool
+		c string
+	}
+
+There is no analog for `C` 's union type, it is fundamentally unsafe.
 
 * Literals
 
@@ -275,36 +320,39 @@ Map literal
 
 	var m = map[string]bool { "Java": false, "Ruby": false, "Go": true }
 
-* Short variable declaration
-
-There are several ways to declare a variable in Go
-
-	// all three vriables are of type int
-	s := 100	
-	var y = 100
-	var x int	// x == 0
-
-Leads to type inference
-
-	f, err := os.Open("/etc/motd")
-
-- `f` is a `*os.File` type
-- `err` is an `error` type interface
-
-* Types, but not subtypes
-
 * Pointers
-
-- Real structs
--- pointers when you need them, but no pointer arithmetic
 
 * Control flow
 
-- if
+`if`
 
-- for
+	if a > b & c { ... }
 
-- switch
+`for`
+
+	var numbers []int
+
+	for i := 0; i < len(numbers); i++ { ... }
+
+	for 
+
+`for` `range`
+
+	for i, num := range numbers { ... }
+
+* Control flow, continue
+
+`switch`
+
+	var s string
+	switch s {
+	case "dave":
+		...
+	case "andrew", "pablo":
+		...
+	default:
+		...
+	}
 
 * Control flow, continue
 
@@ -339,10 +387,13 @@ Also a `goto`
 
 * Errors, not exceptions
 
-- leverage multiple return values and a convention
+Leverage multiple return values and a convention
 
-- "Errors are just values" -Rob Pike, Gophercon 2014
+Go has `panic` and `recover`, but they are not the same as exceptoins.
 
+"Errors are just values" -Rob Pike, Gophercon 2014
+
+[[http://blog.golang.org/error-handling-and-go][Error handling and Go]]
 
 * Interfaces
 
@@ -361,23 +412,25 @@ Anything which declares the appropriate method set implements that interface aut
 `io.Writer`
 
 	type Writer interface {
-        	Write(p []byte) (n int, err error)
+		Write(p []byte) (n int, err error)
 	}
 
-From the `fmt` pacakge.
+From the `fmt` package.
 
 	func Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error)
 
 Here are some types that implment `io.Writer`
 
-	bufio.NewWriter
-	bytes.Buffer
+	*bufio.Writer
+	*bytes.Buffer
 	net.Conn
 	*os.File
 
 * Packages
 
-explicit dependencies, import "fmt", then _fmt_'s symbols are referened by fmt. prefix.
+Packages define modules 
+
+Explicit dependencies, import "fmt", then _fmt_ 's symbols are referenced by the `fmt.` prefix.
 
 	import "fmt"
 
@@ -387,7 +440,15 @@ explicit dependencies, import "fmt", then _fmt_'s symbols are referened by fmt. 
 
 Packages enabled incremental compilation and 
 
+Packages are also key to the initalisation semantics
+
+Circular dependencies are not allowed
+
+- If you are running into issues of circular imports in your program, you may have overused packages.
+
 * Reflection
+
+The `reflect` package and the empty interface, `interface{}` provide Go with its introspection capabilities.
 
 [[http://blog.golang.org/laws-of-reflection][The Laws of Reflection]]
 
@@ -409,9 +470,9 @@ Packages enabled incremental compilation and
 
 - The usual libc/libm cast of characters
 
-- Support for networking, http, tls 
+- Support for networking, http, TLS 
 
-- Support for common encoding, xml, json
+- Support for common encodings, XML, JSON
 
 - Support for compression
 
@@ -427,35 +488,27 @@ Prior to Go 1.0 many packages were moved out of the standard library, or culled 
 
 - Experimental support for writing some class of Android application coming soon.
 
-* Excellent cross platform support, continued
-
 Cross platform is defined as the superset of all platforms with some not supporting a feature, rather than the lowest common denominator
-
-- Tooling supports a simple conditional compilation model to cope with various platform differences (more on that later)
 
 * Excellent cross architecture support
 
-- gc toolchain supports arm, amd64 and i386. Support for powerpc64 in the works
+gc toolchain supports arm, amd64 and i386. Support for powerpc64 in the works.
 
-- gccgo toolchain supports all of the abovei, and more, like MIPS.
-
-- Garbage collected
-
-- Built in maps / slices
-
-- First class functions, closures and lambdas.
+gccgo toolchain supports all of the abovei, and more, like MIPS.
 
 * Tools
 
 `/usr/bin/go`
 
-Simple, zero configuration build tool
+Simple, zero configuration build tool.
 
-- conditional compilation via suffixes, and build tags
+Supports conditional compilation via suffixes, and build tags.
+
+- Tooling supports a simple conditional compilation model to cope with various platform differences (more on that later)
+
+Support for cross compilation.
 
 * $GOPATH
-
-- cross compilation and conditional compilation.
 
 - go vet, no warnings
 
@@ -477,32 +530,15 @@ Simple, zero configuration build tool
 
 * Performance
 
-- Depending on your requirements; good to excellent
+Depending on your requirements; good to excellent
 
-- Varies by architecture; amd64 is the poster child due to its ubiquity
+Varies by architecture; amd64 is the poster child due to its ubiquity
 
-- All platforms have improved overtime
+All platforms have improved overtime
 
 * Go 1.0 vs tip (Go 1.4)
 
-.image introduction-to-go/go1-vs-tip.png
-
-* Application
-
-- cross compilation
-One of the unexpected successes of Go is its applicability for programmers producing cross platform CLI tools, previously a domain of C and operating system distributions.
-
-- static tools
-
-Go appears to be attractive to the scientific and bioinformatic communities, displacing their use of scipy/numpy. Scientists appear to be a pragmatic bunch and I like to think that Go is a language that helps them get stuff done.
-
-The static binary story is very refreshing, considering the previous decade’s focus on managed runtimes and dynamic languages, both of which have a complex and unwieldy distribution story. This appears to be very attractive to system administrators and others who identify with the ‘devops’ moniker.
-
-In this space we see projects like Docker and Hashicorp’s stable of tools like Consul, Serf, and the recently released Terraform, leading the charge.
-
-Another recent surprise is the experimental support for Go on Android that David Crawshaw is working on for the 1.4 release.
-
-Lastly, I think the potential of Go as a language to teach the art and the profession of programming is enormous.
+.image introduction-to-go/go1-vs-tip.png _ 580
 
 * How to get started
 
