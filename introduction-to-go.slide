@@ -15,6 +15,14 @@ Thank you to our sponsor at CSIRO for the space.
 
 Thank you those attending for taking the time to come out tonight. 
 
+* Who am I
+
+Programming grunt from Sydney, Australia.
+
+Passionate about all things Go since 2010.
+
+Co-organiser of the Sydney Go Users group along with Andrew Gerrand.
+
 * Outline of this talk
 
 The history of Go project
@@ -43,7 +51,7 @@ Rob Pike's 2012 paper, [[http://commandcenter.blogspot.com.au/2012/06/less-is-ex
 
 * Public announcement
 
-First public announcement November, 2009. [[https://www.youtube.com/watch?v=rKnDgT73v8s][The Go Programming Language, 2009]]
+First public announcement November 10th, 2009. [[https://www.youtube.com/watch?v=rKnDgT73v8s][The Go Programming Language, 2009]]
 
 .image introduction-to-go/pike-2009.png
 
@@ -53,7 +61,7 @@ Go is an open source project.
 
 All the commits, code review, design are done in the open on a public mailing lists.
 
-The only qualifications for contributing to the project is free time.
+The only qualification for [[http://golang.org/doc/contribute.html][contributing]] to the project is free time.
 
 * 2009 - 2012
 
@@ -78,15 +86,26 @@ The fourth, Go 1.4, is on target to ship in December.
 Rough 6 month release cycle
 
 - 3 month change window, 3 month stabalisation.
+
 - Big ticket features are discussed before the change window opens.
 
 Each release has bought incremental improvements in the compilers, the runtime, the garbage collector.
 
 New platforms and new architectures added.
 
-Stable - the bar for adding a new feature is insurmountably high.
+* Stable 
 
-- link to r's Gophercon 2014 talk, http://talks.golang.org/2014/hellogophers.slide
+Pro:
+
+- The language is guarenteed to be stable for the lifetime of Go 1.
+
+- We assert this on every commit.
+
+- Your code you write today will continue to compile under any newer version of Go.
+
+Con:
+
+- The bar for adding a new feature is now insurmountably high.
 
 * Language Overview
 
@@ -94,15 +113,16 @@ Stable - the bar for adding a new feature is insurmountably high.
 
 - expand on this
 
-* Good support for concurrency and communication
-
-- Multicore is a reality, multiprocessing is not a solution
-
 * Safety
 
 - Typed, and type safe
 
-	
+	var i int = -1
+	var u uint = 200
+
+	i = u	// nope
+
+	if i > u { ... }	// nope
 
 - Array accesses are bounds checked
 
@@ -112,12 +132,14 @@ Stable - the bar for adding a new feature is insurmountably high.
 		// oops
 	}
 
+- no dangling pointers, return a stack value from a function with impunity
+
+* Safety, continued
+
 - All memory is zeroed if not explicitly initialised
 
 	var q int	// initalised to 0
 	var f = 7	// initalised to 7, type defaults to int
-
-* Safety, continued
 
 - Pointers, but no pointer arythmetic
 
@@ -131,13 +153,31 @@ Stable - the bar for adding a new feature is insurmountably high.
 	if i { ... }	// nope
 	if i != 0 { ... }
 
+* Good support for concurrency and communication
+
+- Multicore is a reality
+
+- Multiprocessing is not a solution
+
 * Garbage collected
+
+- not optional (see below, an opinionated language)
+
+- enables concurrency, eliminates the bookkeeping errors related to ownership of shared values.
+
+- elimitates an entire class of use after free and memory leak bugs 
+
+- performance is good and getting better every release, plans are afoot for a new concurrent compacting collector in the next 12 months.
+
+- in the cases that I have investigated where reporters were blaming the garbage collector for poor performance, these were always cases where their allocation rate was unsustainable.
 
 * Speed
 
 Go is often quoted for its fast compilation, but this is only one fascet of the idea of Go being a _fast_ language to program in.
 
 - False dycotomy of static languages being "slow and painful" and dynamic langauges being "fast and fun"
+
+"Clumsy type systems drive people to dynamically typed languages" -Robert Griesemer
 
 Specifically to address the issues
 
@@ -176,28 +216,192 @@ Specifically to address the issues
 
 - Focus on readable code, to the point of being boring -- but it is regular, all Go code looks the same, very easy to work with other's code (assuming it is sane), very easy to spot insane code.
 
-* Arrays, slices and mapsA
+* Constants
+
+- constant types, strings, bools, integers, floats, complex
+
+- arbitrary precision
+
+.code introduction-to-go/precision.go /START OMIT/,/END OMIT/
+
+* Variables
+
+* Expressions
+
+* Statements
+
+- Statements are _not_ Expressions
+
+	if x = 1 { ... } // nope
+	if x = 1; x == 1 { ... } // yes
+
+	y = x++	// nope		
+
+* Arrays, slices and maps
+
+Arrays, typed vectors
+
+	var buf [100]byte	// an array of 100 bytes
+	var buf2 [20]byte	// an array of 20 bytes
+
+	buf = buf2	// nope
+
+Slices
+
+	var buf []byte
+	var buf2 []byte
+
+	buf = make([]byte, 20)
+	buf2 = buf
+
+* Arrays, slices and maps, continued
+
+Maps
+	
+	var m map[string]int
+
+* Literals
+
+Array literal
+
+	var a = [4]int { 1, 3, 5, 7 }
+	var b = [...]int { 7, 7, 7 }	// b is of type [3]int
+
+Slice literal
+
+	var s = []string{ "alpha", "beta", "gamma" }
+	
+Map literal
+
+	var m = map[string]bool { "Java": false, "Ruby": false, "Go": true }
+
+* Short variable declaration
+
+There are several ways to declare a variable in Go
+
+	// all three vriables are of type int
+	s := 100	
+	var y = 100
+	var x int	// x == 0
+
+Leads to type inference
+
+	f, err := os.Open("/etc/motd")
+
+- `f` is a `*os.File` type
+- `err` is an `error` type interface
 
 * Types, but not subtypes
+
+* Pointers
 
 - Real structs
 -- pointers when you need them, but no pointer arithmetic
 
+* Control flow
 
-* Functions, methods
+- if
+
+- for
+
+- switch
+
+* Control flow, continue
+
+Labeled `break`
+
+	done:
+	for x := range y {
+		for k, v := range x {
+			if k == "dave" {
+				fmt.Println(v)
+				break done
+			}
+		}
+	}	
+
+Also a `goto`
+
+* Functions
 
 - Multiple return values the norm
 
+* Methods
+
 - methods may be attached to _any_ type that you declare
+
+- no constructor or destructor
+
+- use New
+
+- discuss, var p = Point{3,4} vs p = &Point{3,4}
+
 
 * Errors, not exceptions
 
-- 
+- leverage multiple return values and a convention
+
+- "Errors are just values" -Rob Pike, Gophercon 2014
+
+
+* Interfaces
+
+Eschew _is_a_ in favor of _has_a_.
+
+Anything which declares the appropriate method set implements that interface automatically.
+
+.code introduction-to-go/parallelogram.go /START1 OMIT/,/END1 OMIT/
+
+* Interfaces, continued
+
+.play introduction-to-go/parallelogram.go /START2 OMIT/,/END2 OMIT/
+
+* Interfaces, continued
+
+`io.Writer`
+
+	type Writer interface {
+        	Write(p []byte) (n int, err error)
+	}
+
+From the `fmt` pacakge.
+
+	func Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error)
+
+Here are some types that implment `io.Writer`
+
+	bufio.NewWriter
+	bytes.Buffer
+	net.Conn
+	*os.File
 
 * Packages
 
-- explicit dependencies, import "fmt", then _fmt_'s symbols are referened by fmt. prefix.
+explicit dependencies, import "fmt", then _fmt_'s symbols are referened by fmt. prefix.
 
+	import "fmt"
+
+	func main() {
+		fmt.Printf("Hello %s\n", "world)
+	}
+
+Packages enabled incremental compilation and 
+
+* Reflection
+
+[[http://blog.golang.org/laws-of-reflection][The Laws of Reflection]]
+
+* Goroutines
+
+- Thread per connection logic without the overhead of a thread
+
+- go
+
+- select
+
+- send
+
+- receive
 
 * Language implementation
 
@@ -273,11 +477,11 @@ Simple, zero configuration build tool
 
 * Performance
 
-Depending on your requirements; good to excellent
+- Depending on your requirements; good to excellent
 
-Varies by architecture; amd64 is the poster child due to its ubiquity
+- Varies by architecture; amd64 is the poster child due to its ubiquity
 
-All platforms have improved overtime
+- All platforms have improved overtime
 
 * Go 1.0 vs tip (Go 1.4)
 
@@ -286,15 +490,18 @@ All platforms have improved overtime
 * Application
 
 - cross compilation
+One of the unexpected successes of Go is its applicability for programmers producing cross platform CLI tools, previously a domain of C and operating system distributions.
 
 - static tools
 
 Go appears to be attractive to the scientific and bioinformatic communities, displacing their use of scipy/numpy. Scientists appear to be a pragmatic bunch and I like to think that Go is a language that helps them get stuff done.
+
 The static binary story is very refreshing, considering the previous decade’s focus on managed runtimes and dynamic languages, both of which have a complex and unwieldy distribution story. This appears to be very attractive to system administrators and others who identify with the ‘devops’ moniker.
+
 In this space we see projects like Docker and Hashicorp’s stable of tools like Consul, Serf, and the recently released Terraform, leading the charge.
-One of the unexpected successes of Go is its applicability for programmers producing cross platform CLI tools, previously a domain of C and operating system distributions.
-I personally would like to see less of a reliance on cgo, and hope that over time the goal of “Pure Go” becomes an aspirational catch cry just as it did with Java (does anyone remember type 2 JDBC drivers ? yuk).
+
 Another recent surprise is the experimental support for Go on Android that David Crawshaw is working on for the 1.4 release.
+
 Lastly, I think the potential of Go as a language to teach the art and the profession of programming is enormous.
 
 * How to get started
@@ -318,3 +525,10 @@ This talk is online
 [[talks.godoc.org/github.com/davecheney/canberra-gophers/introduction-to-go.slide][talks.godoc.org/github.com/davecheney/canberra-gophers/introduction-to-go.slide]]
 
 All the links inside the talk are clickable, I encourage you to follow them.
+
+Also, please take the time to visit
+
+- Rob Pike's [[http://talks.golang.org/2014/hellogophers.slide][Gophercon 2014 Keynote]]
+
+- Francesc Campoy Flores' [[http://talks.golang.org/2013/go4python.slide][Go for Pythonistas]] and [[http://talks.golang.org/2014/go4java.slide][Go for Javaïstes]]
+
