@@ -81,13 +81,13 @@ Go 1.0 marked a line in the sand
 
 The fourth, Go 1.4, is on target to ship in December.
 
-Rough 6 month release cycle; 3 month change window, 3 month stabalisation.
+Rough 6 month release cycle; 3 month change window, 3 month stabilisation.
 
 Big ticket features are discussed before the change window opens.
 
-Each release has bought incremental improvements in the compilers, the runtime, the garbage collector.
-
 New platforms and new architectures added.
+
+Each release has bought incremental improvements in the compilers, the runtime, the garbage collector.
 
 * Stability
 
@@ -111,7 +111,6 @@ Typed, and type safe
 	var u uint = 200
 
 	i = u	// nope, incompatible types
-	if i > u { ... }	// nope, no coercion to bool
 
 Array accesses are bounds checked
 
@@ -130,13 +129,13 @@ No dangling pointers, return a stack value from a function with impunity.
 
 All memory is zeroed if not explicitly initialised
 
-	var q int	// initalised to 0
-	var f = 7	// initalised to 7, type defaults to int
+	var q int	// initialised to 0
+	var f = 7	// initialised to 7, type defaults to int
 
 No implicit conversions; booleans and integers are not aliases
 
 	i := 2
-	if i { ... }	// nope
+	if i { ... }	// nope, no coercion to bool
 
 * Good support for concurrency and communication
 
@@ -144,7 +143,7 @@ No implicit conversions; booleans and integers are not aliases
 
 - Multiprocessing is not a solution.
 
-- Networking support baked into the standard library, intergrated into the runtime.
+- Networking support baked into the standard library, integrated into the runtime.
 
 * Garbage collected
 
@@ -160,7 +159,7 @@ Performance is good and getting better every release, plans are afoot for a new 
 
 Go is often noted for its fast compilation, but this is only one facet of the idea of Go being a _fast_ language to program in.
 
-"False dichotomy of static languages being "'slow and painful'" and dynamic languages being 'fast and fun'" -Rob Pike
+"False dichotomy of static languages being 'slow and painful' and dynamic languages being 'fast and fun'" -Rob Pike
 
 "Clumsy type systems drive people to dynamically typed languages" -Robert Griesemer
 
@@ -174,13 +173,13 @@ Go is an attempt to demonstrate that a language can be both fast in terms of the
 
 - The compiler does not issue warnings, only errors.
 
-- A single way to format code as defined by `go fmt` (more on this later)
+- A single way to format code as defined by `go`fmt`.
 
 * Whirlwind language tour
 
 * Constants
 
-Constants come in various kinds, and are by default untyped. 
+Constants come in various kinds and are by default untyped. 
 	
 	const (
 		OperatingSystem = "Windows"
@@ -303,9 +302,9 @@ Structs are composite types
 
 There is no analog for `C` 's union type, it is fundamentally unsafe.
 
-Unitialised structs contain fields who themselves are set to their own zero value.
+Uninitialised structs contain fields who themselves are set to their zero value.
 
-There are no constructors, or destructors. 
+There are no constructors, or destructors, use the zero value if possible. If not the following is quite common:
 
 	func NewFoo() *Foo {
 		return &Foo {
@@ -331,13 +330,19 @@ No pointer arithmetic
         y := &x
         y += 4          // nope
 
+For each type, there exists a distinct pointer type, accessible via the address of (`&`), and dereference (`*`) operators.
+
 * Control flow
 
 `if`
 
-	if a > b & c { ... }
+	if a > b & c { 
+		// something
+	} else {
+		// something else
+	}
 
-No need for parens, precidence headaches from C are fixed, however the braces around the block are always required
+No need for parens, precedence headaches from C are fixed, however the braces around the block are always required
 
 `for`
 
@@ -349,12 +354,12 @@ No need for parens, precidence headaches from C are fixed, however the braces ar
 
 	for { // loop forever }
 
+* Control flow, continued
+
 `range` over arrays, slices, and maps
 
 	for i, num := range numbers { ... }
 	for city, pop := range population { ... }
-
-* Control flow, continued
 
 `switch`
 
@@ -395,7 +400,7 @@ Return values may also be given names
 
 * Methods
 
-Methods can be declared on any type that you have declared in that package.
+Methods can be declared on any type declared in that package.
 
 A method on a struct:
 
@@ -414,11 +419,11 @@ Methods can be declared on value types, or pointer types, and these method sets 
 
 * Interfaces
 
-Eschew _is_a_ in favor of _has_a_.
+Go does not support inheritence or sub classing
+
+It eschew _is_a_ via inheritence, in favor of _has_a_ via interfaces.
 
 Anything which declares the appropriate method set implements that interface automatically.
-
-Interface values contain both a type and a value.
 
 .code introduction-to-go/parallelogram.go /START1 OMIT/,/END1 OMIT/
 
@@ -448,9 +453,13 @@ Here are some types that implement `io.Writer`
 
 * Packages
 
-Packages define modules 
+Packages define boundaries for compilation and reuse.
 
-Explicit dependencies, import "fmt", then _fmt_ 's symbols are referenced by the `fmt.` prefix.
+The unit of compilation is the package, not the file.
+
+You import a whole package, not a type, or a symbol.
+
+Packages you import are referenced by their package's prefix.
 
 	import "fmt"
 
@@ -458,15 +467,7 @@ Explicit dependencies, import "fmt", then _fmt_ 's symbols are referenced by the
 		fmt.Printf("Hello %s\n", "world)
 	}
 
-Packages enabled incremental compilation and 
-
-- Unit of compilation is the package, not the file.
-
-- Unit of importing is the package, not a type, or a symbol.
-
-Packages are also key to the initalisation semantics
-
-Circular dependencies are not allowed
+Circular dependencies are not allowed.
 
 - If you are running into issues of circular imports in your program, you may have overused packages.
 
@@ -474,7 +475,7 @@ Circular dependencies are not allowed
 
 Go provides two important concepts:
 
-- A goroutine is a thread of control within the program, with its own local variables and stack. Cheap, easy to create.
+- A goroutine is a thread of control within the program, with its own local variables and stack. Much cheaper to create and schedule than operating system threads.
 - A channel carries typed messages between goroutines.
 
 * Goroutines
@@ -491,7 +492,7 @@ Communicate between goroutines.
 
 * Select
 
-Select allows you to choose between multiple channel operatoins
+Select allows you to choose between multiple channel operations
 
 .code introduction-to-go/select.go /START OMIT/,/END OMIT/
 
@@ -533,7 +534,7 @@ To a first order approximation, the std lib provides only the things needed to b
 
 - Experimental support for writing some class of Android application coming soon.
 
-Cross platform is defined as the super set of all platforms with some not supporting a feature, rather than the lowest common denominator.
+Cross platform is defined as the super set of all platforms with some not supporting a particular feature, rather than the lowest common denominator.
 
 * Excellent cross architecture support
 
@@ -549,7 +550,7 @@ Other implementations, llgo, tardis-go, etc, keep us honest by writing to the sp
 
 `/usr/bin/go`
 
-Simple, zero configuration build tool.
+Simple, zero configuration, build tool.
 
 All commands and paths are relative to your [[http://golang.org/doc/code.html#GOPATH][$GOPATH]] workspace.
 
@@ -573,7 +574,7 @@ Solve code formatting issues, once and for all
 
 	go fmt $PKG
 
-Built in [[http://golang.org/pkg/testing/][testing framework]], including [[http://blog.golang.org/cover][coverage reports]]
+Built in [[http://golang.org/pkg/testing/][testing framework]], including benchmarking and [[http://blog.golang.org/cover][coverage reports]]
 
 	go test $PKG
 	go test -cover $PKG
@@ -588,7 +589,7 @@ Depending on your requirements; good to excellent.
 
 Varies by architecture; amd64 is the poster child due to its ubiquity.
 
-All platforms, amd64, 386, and arm, have improved overtime.
+All platforms have improved overtime.
 
 * Go 1.0 vs tip (Go 1.4)
 
