@@ -8,7 +8,7 @@ func server(listener net.Listener) {
 		client, _ := listener.Accept()
 		go handle(client)
 	}
-}	
+}
 
 func handle(client net.Conn) {
 	// handle connection
@@ -20,4 +20,5 @@ func main() {
 
 	// do some other stuff
 }
+
 // END OMIT
