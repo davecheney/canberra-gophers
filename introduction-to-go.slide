@@ -43,7 +43,7 @@ Russ Cox and Ian Lance Taylor joined soon after.
 
 There is a story that Go was designed while waiting for a C++ program to compile.
 
-In reality, Go was a response to the many of the factors that Rob, Robert and Ken experienced at the time with the languages in use at Google; C++, Java, and Python.
+In reality, Go was a response to the many of the frustrations that Rob, Robert and Ken experienced with the languages in use at Google at that time; C++, Java, and Python.
 
 Rob Pike's 2012 paper, [[http://commandcenter.blogspot.com.au/2012/06/less-is-exponentially-more.html][Less is exponentially more]] gives an excellent overview of the environment that gave rise to Go.
 
@@ -51,13 +51,13 @@ Rob Pike's 2012 paper, [[http://commandcenter.blogspot.com.au/2012/06/less-is-ex
 
 First public announcement November 10th, 2009. [[https://www.youtube.com/watch?v=rKnDgT73v8s][The Go Programming Language, 2009]]
 
-.image introduction-to-go/pike-2009.png
+.image introduction-to-go/pike-2009.png _ 700
 
 * Open source
 
 Go is an open source project.
 
-All the commits, code review, design, debate, etc, are done in the open on a public mailing lists.
+All the commits, code review, design, debate, etc, are all done in the open on a public mailing lists.
 
 The only qualification for [[http://golang.org/doc/contribute.html][contributing]] to the project is free time.
 
@@ -93,7 +93,7 @@ New platforms and new architectures added.
 
 Pro:
 
-- Your code you write today will continue to work with newer versions of Go 1.
+- Your code you write today will continue to work with newer versions of Go.
 
 - We assert this on every commit.
 
@@ -110,8 +110,8 @@ Typed, and type safe
 	var i int = -1
 	var u uint = 200
 
-	i = u	// nope
-	if i > u { ... }	// nope
+	i = u	// nope, incompatible types
+	if i > u { ... }	// nope, no coercion to bool
 
 Array accesses are bounds checked
 
@@ -121,12 +121,12 @@ Array accesses are bounds checked
 		// oops
 	}
 
+* Safety, continued
+
 No dangling pointers, return a stack value from a function with impunity.
 
 - Compiler will move allocations to the heap if required.
 - Escape analysis will move them back if not.
-
-* Safety, continued
 
 All memory is zeroed if not explicitly initialised
 
@@ -137,13 +137,14 @@ No implicit conversions; booleans and integers are not aliases
 
 	i := 2
 	if i { ... }	// nope
-	if i != 0 { ... } // yes
 
 * Good support for concurrency and communication
 
-- Multicore is a reality
+- Multicore is a reality.
 
-- Multiprocessing is not a solution
+- Multiprocessing is not a solution.
+
+- Networking support baked into the standard library, intergrated into the runtime.
 
 * Garbage collected
 
@@ -151,23 +152,23 @@ Eliminates the bookkeeping errors related to ownership of shared values.
 
 Eliminates an entire class of use after free and memory leak bugs.
 
+Enables simpler, cleaner, APIs.
+
 Performance is good and getting better every release, plans are afoot for a new concurrent compacting collector in the next 12 months.
 
 * Speed
 
-Go is often cited for its fast compilation, but this is only one facet of the idea of Go being a _fast_ language to program in.
+Go is often noted for its fast compilation, but this is only one facet of the idea of Go being a _fast_ language to program in.
 
-- False dichotomy of static languages being "slow and painful" and dynamic languages being "fast and fun"
+"False dichotomy of static languages being "'slow and painful'" and dynamic languages being 'fast and fun'" -Rob Pike
 
 "Clumsy type systems drive people to dynamically typed languages" -Robert Griesemer
 
-Specifically to address the issues
-
-- "Fixing it by adding more software isn't going to do it" -[[http://youtu.be/rKnDgT73v8s?t=7m][Rob Pike, Nov 2009]]
+Go is an attempt to demonstrate that a language can be both fast in terms of the programs it produces and fast (productive?) for the authors.
 
 * Opinionated
 
-- Unused variables are an error.
+- Unused local variables are an error.
 
 - Unused imports are also an error.
 
@@ -179,9 +180,15 @@ Specifically to address the issues
 
 * Constants
 
-Constants come in various kinds, but are by default untyped. 
-
-Constant strings, bools, integers, floats, complex numbers.
+Constants come in various kinds, and are by default untyped. 
+	
+	const (
+		OperatingSystem = "Windows"
+		Secure = false		
+		BuildNumber = 9001	
+		OneThird = 1.0/3
+		ThreeThirds = 3 * OneThird	// exactly 1
+	)
 
 Untyped constants operate with arbitrary precision.
 
@@ -205,6 +212,10 @@ The usual suspects
 
 - Complex type, `complex128`
 
+- Compound types, `arrays`, `slices`, `maps`, `structs`
+
+- Pointer types, `*int`, `*bufio.Reader`
+
 * Variables
 
 There are several ways to declare a variable in Go
@@ -220,8 +231,10 @@ Leads to type inference
 
 	f, err := os.Open("/etc/motd")
 
-- `f` is a `*os.File` type
-- `err` is an `error` interface type
+The case of the symbol (variable, constant, function or type) defines its visibility
+
+	const PI = 3.14			// exported
+	type flags struct { ... } 	// not exported
 
 * Expressions and Statements
 
@@ -231,7 +244,7 @@ Statements are _not_ Expressions.
 
 	y = x++	// nope		
 
-	if x = 1 { ... } // nope
+	if x = 1 { ... } // nope, assignment is a statement
 
 * Arrays and Slices
 
@@ -242,7 +255,7 @@ Different sized arrays are different types.
 	var buf [100]byte	// an array of 100 bytes
 	var buf2 [20]byte	// an array of 20 bytes
 
-	buf = buf2	// nope
+	buf = buf2	// nope, different types
 
 Slices are dynamically typed vectors that reference an underlying array.
 
@@ -269,7 +282,7 @@ Adding a value to a map
 
 	population["canberra"] = 358222
 
-Deleteing a value
+Removing a value
 
 	delete(population, "perth")	// Secessionism
 
@@ -282,7 +295,7 @@ Testing for a value
 
 Structs are composite types
 
-	type S struct {
+	type Foo struct {
 		A int
 		B bool
 		c string
@@ -290,12 +303,27 @@ Structs are composite types
 
 There is no analog for `C` 's union type, it is fundamentally unsafe.
 
+Unitialised structs contain fields who themselves are set to their own zero value.
+
+There are no constructors, or destructors. 
+
+	func NewFoo() *Foo {
+		return &Foo {
+			A: -6,
+			B: true,
+			c: "welcome dr. falcon",
+		}
+	}		
+
 * Pointers
 
 Pointers are values which point to other values
 
-	q := 
-	
+	q := "Tony Abbott"
+	p := &q
+
+	*p = "Kevin Rudd"
+	fmt.Println(q)	
 
 No pointer arithmetic
 
@@ -309,7 +337,7 @@ No pointer arithmetic
 
 	if a > b & c { ... }
 
-No need for parens, precidence headaches from C are fixed
+No need for parens, precidence headaches from C are fixed, however the braces around the block are always required
 
 `for`
 
@@ -321,7 +349,7 @@ No need for parens, precidence headaches from C are fixed
 
 	for { // loop forever }
 
-`for` `range` over arrays, slices, and maps
+`range` over arrays, slices, and maps
 
 	for i, num := range numbers { ... }
 	for city, pop := range population { ... }
@@ -340,7 +368,7 @@ No need for parens, precidence headaches from C are fixed
 		...
 	}
 
-break, goto, continue, fallthrough
+Note shown: break, goto, continue, fallthrough
 
 * Functions
 
@@ -348,7 +376,7 @@ A `Max` function
 
 	func Max(a int, b int) int {
 		if a > b {
-			return ar
+			return a
 		}
 		return b
 	}
@@ -361,25 +389,28 @@ Multiple return values
 
 Multiple return values the norm, part of the error handling convention.
 
+Return values may also be given names
+
+	func PersonalInformation() (username string, password string, address string)
+
 * Methods
 
+Methods can be declared on any type that you have declared in that package.
+
 A method on a struct:
-func (p Person) Major() bool {
-    return p.age >= 18
-}
+
+	func (p Person) Major() bool {
+		return p.age >= 18
+	}
+
 But also a method on a float64:
-func (c Celsius) Freezing() bool {
-    return c <= 0
-}
-Constraint: Methods can be defined only on types declared in the same package.
-// This won't compile
-func (s string) Length() int { return len(s) }
 
-- no constructor or destructor
+	type Celsius float64
+	func (c Celsius) Freezing() bool {
+		return c <= 0
+	}
 
-- use New
-
-- discuss, var p = Point{3,4} vs p = &Point{3,4}
+Methods can be declared on value types, or pointer types, and these method sets are considered distinct.
 
 * Interfaces
 
@@ -413,6 +444,7 @@ Here are some types that implement `io.Writer`
 	*bytes.Buffer
 	net.Conn
 	*os.File
+	io.Discard
 
 * Packages
 
@@ -440,18 +472,22 @@ Circular dependencies are not allowed
 
 * Concurrency
 
-Goroutines provide light weight thread per connection logic without the overhead of a thread.
+Go provides two important concepts:
 
-- go
+- A goroutine is a thread of control within the program, with its own local variables and stack. Cheap, easy to create.
+- A channel carries typed messages between goroutines.
 
 * Goroutines
 
+A simple server example.
+
+.code introduction-to-go/server.go /START OMIT/,/END OMIT/
 
 * Channels
 
-- send
+Communicate between goroutines.
 
-- receive
+.play introduction-to-go/send-recv.go /START OMIT/,/END OMIT/
 
 * Select
 
@@ -459,17 +495,21 @@ Select allows you to choose between multiple channel operatoins
 
 .code introduction-to-go/select.go /START OMIT/,/END OMIT/
 
-Select also allows non-block send and receive operations
+Select also allows non-blocking send and receive operations
 
 .code introduction-to-go/recv.go /START OMIT/,/END OMIT/
 
 * Not covered
+
+Defer
 
 [[http://blog.golang.org/laws-of-reflection][Reflection]]
 
 CGO
 
 [[http://blog.golang.org/error-handling-and-go][Error handling]]
+
+First class functions and lexical closures.
 
 * Language implementation
 
