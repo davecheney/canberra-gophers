@@ -318,11 +318,7 @@ There are no constructors, or destructors, use the zero value if possible. If no
 
 Pointers are values which point to other values
 
-	q := "Tony Abbott"
-	p := &q
-
-	*p = "Kevin Rudd"
-	fmt.Println(q)	
+.play introduction-to-go/politics.go /START OMIT/,/END OMIT/
 
 No pointer arithmetic
 
@@ -373,7 +369,7 @@ No need for parens, precedence headaches from C are fixed, however the braces ar
 		...
 	}
 
-Note shown: break, goto, continue, fallthrough
+Not shown: break, goto, continue, fallthrough
 
 * Functions
 
@@ -589,7 +585,7 @@ Depending on your requirements; good to excellent.
 
 Varies by architecture; amd64 is the poster child due to its ubiquity.
 
-All platforms have improved overtime.
+All platforms have improved over time.
 
 * Go 1.0 vs tip (Go 1.4)
 

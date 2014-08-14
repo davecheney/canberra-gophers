@@ -22,7 +22,7 @@ type Parallelogram interface {
 }
 
 func Area(p Parallelogram) {
-	fmt.Printf("Heigth: %d, Width: %d, Area: %d\n",
+	fmt.Printf("Height: %d, Width: %d, Area: %d\n",
 		p.Height(), p.Width(), p.Height()*p.Width())
 }
 
